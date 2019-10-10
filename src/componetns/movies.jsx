@@ -6,6 +6,7 @@ import { getGenres } from "../services/fakeGenreService";
 import Pagination from "./common/pagination";
 import { paginate } from './../utils/paginate';
 import _ from 'lodash';
+import TableHeader from "./common/tableHeader";
 
 class Movies extends Component {
   state = {
@@ -55,6 +56,15 @@ class Movies extends Component {
   }
 
   render() {
+    const columns = [
+      {path: 'title', label: 'Title'},
+      {path: 'genre.name', label: 'Genre'},
+      {path: 'numberInStock', label: 'Stock'},
+      {path: 'dailyRentalRate', label: 'Rate'},
+      {key:'like'},
+      {key:'delete'}
+    ];
+
     const { movies: allMovies, genres, pageSize, currentPage, selectedGenre, sortColumn } = this.state;
     if (allMovies.length === 0) return <p>There is no movie in Database</p>;
 
@@ -74,16 +84,7 @@ class Movies extends Component {
           <div className="col">
             <p>Showing {filtered.length} movies in Database</p>
             <table className="table">
-              <thead style={{cursor: 'pointer'}}>
-                <tr>
-                  <th onClick={() => this.handleSort('title')}>Title</th>
-                  <th onClick={() => this.handleSort('genre.name')}>Genre</th>
-                  <th onClick={() => this.handleSort('numberInStock')}>Stock</th>
-                  <th onClick={() => this.handleSort('dailyRentalRate')}>Rate</th>
-                  <th></th>
-                  <th></th>
-                </tr>
-              </thead>
+             <TableHeader columns={columns} onSort={this.handleSort}/>
               <tbody>
                 {movies.map(movie => (
                   <tr key={movie._id}>
