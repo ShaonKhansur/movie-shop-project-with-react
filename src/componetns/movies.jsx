@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import { getMovies } from "./../services/fakeMovieService";
 import Like from "./common/like";
+import MoviesTable from "./moviesTable";
 import ListGroup from "./common/ListGroup";
 import { getGenres } from "../services/fakeGenreService";
 import Pagination from "./common/pagination";
-import { paginate } from './../utils/paginate';
-import _ from 'lodash';
+import { paginate } from "./../utils/paginate";
 import TableHeader from "./common/tableHeader";
+import TableBody from "./common/tableBody";
+import _ from "lodash";
 
 class Movies extends Component {
   state = {
@@ -14,11 +16,11 @@ class Movies extends Component {
     genres: [],
     pageSize: 4,
     currentPage: 1,
-    sortColumn: {path: 'title', order: 'asc'}
+    sortColumn: { path: "title", order: "asc" }
   };
 
   componentDidMount() {
-    const genres = [{name: 'All Movies'}, ...getGenres()]
+    const genres = [{ name: "All Movies" }, ...getGenres()];
     const movies = getMovies();
     this.setState({ movies, genres });
   }
@@ -41,34 +43,36 @@ class Movies extends Component {
   };
 
   handlePageChange = page => {
-    this.setState({currentPage: page});
+    this.setState({ currentPage: page });
   };
 
   handleSort = path => {
     const sortColumn = this.state.sortColumn;
-    if(sortColumn.path === path) 
-      sortColumn.order = (sortColumn.order === 'asc') ? 'desc' : 'asc';
+    if (sortColumn.path === path)
+      sortColumn.order = sortColumn.order === "asc" ? "desc" : "asc";
     else {
       sortColumn.path = path;
-      sortColumn.order = 'asc'
-    } 
-    this.setState({sortColumn})
-  }
+      sortColumn.order = "asc";
+    }
+    this.setState({ sortColumn });
+  };
 
   render() {
-    const columns = [
-      {path: 'title', label: 'Title'},
-      {path: 'genre.name', label: 'Genre'},
-      {path: 'numberInStock', label: 'Stock'},
-      {path: 'dailyRentalRate', label: 'Rate'},
-      {key:'like'},
-      {key:'delete'}
-    ];
-
-    const { movies: allMovies, genres, pageSize, currentPage, selectedGenre, sortColumn } = this.state;
+   
+    const {
+      movies: allMovies,
+      genres,
+      pageSize,
+      currentPage,
+      selectedGenre,
+      sortColumn
+    } = this.state;
     if (allMovies.length === 0) return <p>There is no movie in Database</p>;
 
-    const filtered = (selectedGenre && selectedGenre._id) ? allMovies.filter(m => m.genre._id === selectedGenre._id) : allMovies;
+    const filtered =
+      selectedGenre && selectedGenre._id
+        ? allMovies.filter(m => m.genre._id === selectedGenre._id)
+        : allMovies;
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
     const movies = paginate(sorted, pageSize, currentPage);
     return (
@@ -83,30 +87,13 @@ class Movies extends Component {
           </div>
           <div className="col">
             <p>Showing {filtered.length} movies in Database</p>
-            <table className="table">
-             <TableHeader columns={columns} onSort={this.handleSort}/>
-              <tbody>
-                {movies.map(movie => (
-                  <tr key={movie._id}>
-                    <td>{movie.title}</td>
-                    <td>{movie.genre.name}</td>
-                    <td>{movie.numberInStock}</td>
-                    <td>{movie.dailyRentalRate}</td>
-                    <td>
-                      <Like movie={movie} onLike={this.handleLike} />
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => this.handleDelete(movie)}
-                        className="btn btn-danger"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <MoviesTable
+              onLike={this.handleLike}
+              onDelete={this.handleDelete}
+              onSort={this.handleSort}
+              data={movies}
+            />
+            
             <Pagination
               onPageChange={this.handlePageChange}
               items={filtered}
