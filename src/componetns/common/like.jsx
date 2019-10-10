@@ -5,7 +5,7 @@ class Like extends Component {
     const { movie, onLike } = this.props;
     return (
       <i
-        style={{cursor: 'pointer'}}
+        style={{ cursor: "pointer" }}
         onClick={() => onLike(movie)}
         className={movie.liked ? "fa fa-heart" : "fa fa-heart-o"}
       ></i>

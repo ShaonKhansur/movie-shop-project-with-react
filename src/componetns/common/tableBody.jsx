@@ -2,10 +2,9 @@ import React, { Component } from "react";
 import _ from "lodash";
 
 class TableBody extends Component {
-
   renderCell = (item, column) => {
-    if(column.content) return column.content(item);
-    return _.get(item, column.path)
+    if (column.content) return column.content(item);
+    return _.get(item, column.path);
   };
 
   render() {
@@ -15,7 +14,9 @@ class TableBody extends Component {
         {data.map(item => (
           <tr key={item._id}>
             {columns.map(column => (
-              <td key={column.path || column.key}>{this.renderCell(item, column)}</td>
+              <td key={column.path || column.key}>
+                {this.renderCell(item, column)}
+              </td>
             ))}
           </tr>
         ))}

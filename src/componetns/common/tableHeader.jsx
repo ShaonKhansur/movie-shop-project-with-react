@@ -7,7 +7,12 @@ class TableHeader extends Component {
       <thead style={{ cursor: "pointer" }}>
         <tr>
           {columns.map(column => (
-            <th key={column.path || column.key} onClick={() => onSort(column.path)}>{column.label}</th>
+            <th
+              key={column.path || column.key}
+              onClick={() => onSort(column.path)}
+            >
+              {column.label}
+            </th>
           ))}
         </tr>
       </thead>

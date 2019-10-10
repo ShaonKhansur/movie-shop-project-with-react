@@ -1,13 +1,10 @@
 import React, { Component } from "react";
 import { getMovies } from "./../services/fakeMovieService";
-import Like from "./common/like";
 import MoviesTable from "./moviesTable";
 import ListGroup from "./common/ListGroup";
 import { getGenres } from "../services/fakeGenreService";
 import Pagination from "./common/pagination";
 import { paginate } from "./../utils/paginate";
-import TableHeader from "./common/tableHeader";
-import TableBody from "./common/tableBody";
 import _ from "lodash";
 
 class Movies extends Component {
@@ -58,7 +55,6 @@ class Movies extends Component {
   };
 
   render() {
-   
     const {
       movies: allMovies,
       genres,
@@ -93,7 +89,7 @@ class Movies extends Component {
               onSort={this.handleSort}
               data={movies}
             />
-            
+
             <Pagination
               onPageChange={this.handlePageChange}
               items={filtered}
