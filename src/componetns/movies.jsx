@@ -5,6 +5,7 @@ import ListGroup from "./common/ListGroup";
 import { getGenres } from "../services/fakeGenreService";
 import Pagination from "./common/pagination";
 import { paginate } from "./../utils/paginate";
+import {Link} from 'react-router-dom';
 import _ from "lodash";
 
 class Movies extends Component {
@@ -54,7 +55,7 @@ class Movies extends Component {
     this.setState({ sortColumn });
   };
 
-  render() {
+  getPageData = () => {
     const {
       movies: allMovies,
       genres,
@@ -63,14 +64,27 @@ class Movies extends Component {
       selectedGenre,
       sortColumn
     } = this.state;
-    if (allMovies.length === 0) return <p>There is no movie in Database</p>;
-
     const filtered =
       selectedGenre && selectedGenre._id
         ? allMovies.filter(m => m.genre._id === selectedGenre._id)
         : allMovies;
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
     const movies = paginate(sorted, pageSize, currentPage);
+    return { movies, filtered};
+  }
+
+  render() {
+    const {
+      movies: allMovies,
+      genres,
+      pageSize,
+      currentPage,
+      sortColumn
+    } = this.state;
+    if (allMovies.length === 0) return <p>There is no movie in Database</p>;
+
+    const {movies, filtered} = this.getPageData();
+
     return (
       <div className="container">
         <div className="row">
@@ -82,6 +96,7 @@ class Movies extends Component {
             />
           </div>
           <div className="col">
+            <Link to="/movie/new" className="btn btn-primary">New Movie</Link>
             <p>Showing {filtered.length} movies in Database</p>
             <MoviesTable
               sortColumn={sortColumn}
