@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import Form from "./common/form";
 import Joi from "joi-browser";
+import { register } from "../services/userServices";
+import { toast } from "react-toastify";
 
 class RegisterForm extends Form {
   state = {
@@ -11,16 +13,31 @@ class RegisterForm extends Form {
   schema = {
     username: Joi.string()
       .email()
-      .required().label('Username'),
+      .required()
+      .label("Username"),
     password: Joi.string()
       .min(3)
-      .required().label('Password'),
+      .required()
+      .label("Password"),
     name: Joi.string()
       .min(3)
-      .required().label('Name')
+      .required()
+      .label("Name")
   };
 
-  doSubmit = () => {
+  doSubmit = async () => {
+    try {
+      const response = await register(this.state.data);
+      localStorage.setItem("token", response.headers["x-auth-token"]);
+      this.props.history.replace("/");
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        const errors = { ...this.state.errors };
+        errors.username = ex.response.data;
+        this.setState({ errors });
+        toast.error("Given email allready register");
+      }
+    }
     console.log("Register submit");
   };
 

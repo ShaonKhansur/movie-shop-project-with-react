@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import Form from "./common/form";
 import Joi from "joi-browser";
-import { getGenres } from './../services/fakeGenreService';
-import {getMovie, saveMovie} from './../services/fakeMovieService';
+import { getGenres } from "./../services/genreServices";
+import { getMovie, saveMovie } from "./../services/movieServices";
 class MovieForm extends Form {
   state = {
     data: { title: "", genreId: "", numberInStock: "", dailyRentalRate: "" },
@@ -30,32 +30,36 @@ class MovieForm extends Form {
       .label("Rate")
   };
 
-  componentDidMount() {
-    const genres = getGenres();
-    this.setState({genres});
+  async componentDidMount() {
+    const { data: genres } = await getGenres();
+    this.setState({ genres });
 
     const movieId = this.props.match.params.id;
-    if(movieId === 'new') return;
+    if (movieId === "new") return;
 
-    const movie = getMovie(movieId);
-    if(!movie) return this.props.history.replace('/not-found');
-
-    this.setState({data: this.mapToviewModel(movie)})
-  };
+    try {
+      const { data: movie } = await getMovie(movieId);
+      this.setState({ data: this.mapToviewModel(movie) });
+    } catch (ex) {
+      if (ex.response && ex.response.status === 404) {
+        this.props.history.replace("/not-found");
+      }
+    }
+  }
 
   mapToviewModel(movie) {
-    return{
+    return {
       _id: movie._id,
       title: movie.title,
       genreId: movie.genre._id,
       numberInStock: movie.numberInStock,
       dailyRentalRate: movie.dailyRentalRate
-    }
+    };
   }
 
-  doSubmit = () => {
-    saveMovie(this.state.data);
-    this.props.history.push('/movies');
+  doSubmit = async () => {
+    await saveMovie(this.state.data);
+    this.props.history.push("/movies");
   };
   render() {
     const { match, history } = this.props;
@@ -64,7 +68,7 @@ class MovieForm extends Form {
         <h1>Movie Form: {match.params.id}</h1>
         <form onSubmit={this.handleSubmit}>
           {this.renderInput("title", "Title", "text")}
-          {this.renderSelect('genreId', 'Genre', this.state.genres)}
+          {this.renderSelect("genreId", "Genre", this.state.genres)}
           {this.renderInput("numberInStock", "Number in Stock", "text")}
           {this.renderInput("dailyRentalRate", "Rate", "text")}
           {this.renderButton("Submit")}
